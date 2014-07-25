@@ -92,7 +92,7 @@ class mongo::server (
     subscribe => File['/etc/mongodb.conf'],
   }
 
-  $infra_hosts = hiera('firewall::mongodb_hosts', [])
+  $infra_hosts = hiera('firewall::infra_hosts', [])
   firewall::multisource {[ prefix($infra_hosts, '200 mongodb,') ]:
     action => 'accept',
     proto  => 'tcp',
