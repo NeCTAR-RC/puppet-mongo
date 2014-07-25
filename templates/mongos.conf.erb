@@ -4,6 +4,8 @@
 logpath=<%= @logpath %>
 logappend=<%= @logappend %>
 
+port = <%= @port %>
+
 # Connection string
 # e.g. configdb=mongos1:27017,mongos2:27017,mongos3:27017
 configdb=<%= @config_hosts.to_a.flatten.map{ |x| x + ':' + @config_port}.join(',') %>
