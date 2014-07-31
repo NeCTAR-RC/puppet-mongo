@@ -33,7 +33,13 @@ class mongo (
   package { 'mongodb':
     name    => $mongo::params::pkg_10gen,
     ensure  => installed,
-    require => Class[$mongo::params::source]
+    require => Class[$mongo::params::source],
+    notify  => Exec['stop-on-package-install'],
+  }
+
+  exec { 'stop-on-package-install':
+    command     => '/usr/sbin/service mongodb stop; echo manual > /etc/init/mongodb.override',
+    refreshonly => true,
   }
 
   logrotate::rule { 'mongodb':
