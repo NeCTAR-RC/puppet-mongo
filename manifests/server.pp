@@ -99,4 +99,36 @@ class mongo::server (
     dport  => $port_real,
   }
 
+  package { 'python-pymongo':
+    ensure => installed,
+  }
+
+  file { '/usr/local/lib/nagios/plugins/check_mongodb':
+    ensure  => file,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    source  => 'puppet:///modules/mongo/check_mongodb',
+    require => [
+      File['/usr/local/lib/nagios/plugins'],
+      Package['python-pymongo'],
+    ]
+  }
+
+  nagios::nrpe::service { 'mongodb_connect':
+    check_command => "/usr/local/lib/nagios/plugins/check_mongodb -P $port_real -A connect"
+  }
+  nagios::nrpe::service { 'mongodb_connections':
+    check_command => "/usr/local/lib/nagios/plugins/check_mongodb -P $port_real -A connections"
+  }
+
+  if $shardsvr == true {
+    nagios::nrpe::service { 'mongodb_replication_lag':
+      check_command => "/usr/local/lib/nagios/plugins/check_mongodb -P $port_real -A replication_lag"
+    }
+    nagios::nrpe::service { 'mongodb_replset_state':
+      check_command => "/usr/local/lib/nagios/plugins/check_mongodb -P $port_real -A replset_state"
+    }
+  }
+
 }
