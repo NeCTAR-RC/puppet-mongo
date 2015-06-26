@@ -17,7 +17,7 @@ class mongo::sources::apt inherits mongo::params {
 
   } else {
     apt::key { '10gen':
-      key        => '7F0CEB10',
+      key        => '492EAFE8CD016A07919F1D2B9ECBEC467F0CEB10',
       key_server => 'keyserver.ubuntu.com',
     }
   }
@@ -26,7 +26,7 @@ class mongo::sources::apt inherits mongo::params {
     location    => $location,
     release     => 'dist',
     repos       => '10gen',
-    key         => '7F0CEB10',
+    key         => '492EAFE8CD016A07919F1D2B9ECBEC467F0CEB10',
     include_src => false,
   }
 
