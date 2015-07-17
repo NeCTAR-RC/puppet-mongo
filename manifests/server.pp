@@ -93,7 +93,7 @@ class mongo::server (
   }
 
   $infra_hosts = hiera('firewall::infra_hosts', [])
-  firewall::multisource {[ prefix($infra_hosts, '200 mongodb,') ]:
+  nectar::firewall::multisource {[ prefix($infra_hosts, '200 mongodb,') ]:
     action => 'accept',
     proto  => 'tcp',
     dport  => $port_real,
