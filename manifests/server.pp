@@ -77,8 +77,8 @@ class mongo::server (
     $port_real = '27017'
   }
 
-  file { '/etc/mongodb.conf':
-    content => template('mongo/mongodb.conf.erb'),
+  file { '/etc/mongod.conf':
+    content => template('mongo/mongod.conf.erb'),
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
@@ -89,7 +89,7 @@ class mongo::server (
     name      => $servicename,
     ensure    => running,
     enable    => true,
-    subscribe => File['/etc/mongodb.conf'],
+    subscribe => File['/etc/mongod.conf'],
   }
 
   $infra_hosts = hiera('firewall::infra_hosts', [])
@@ -101,6 +101,16 @@ class mongo::server (
 
   package { 'python-pymongo':
     ensure => installed,
+  }
+
+  exec { 'disable_transparent_hugepage_enabled':
+    command => '/bin/echo never > /sys/kernel/mm/transparent_hugepage/enabled',
+    unless  => '/bin/grep -c \'\[never\]\' /sys/kernel/mm/transparent_hugepage/enabled 2>/dev/null',
+  }
+
+  exec { 'disable_transparent_hugepage_defrag':
+    command => '/bin/echo never > /sys/kernel/mm/transparent_hugepage/defrag',
+    unless  => '/bin/grep -c \'\[never\]\' /sys/kernel/mm/transparent_hugepage/defrag 2>/dev/null',
   }
 
   file { '/usr/local/lib/nagios/plugins/check_mongodb':
@@ -115,20 +125,23 @@ class mongo::server (
     ]
   }
 
-  nagios::nrpe::service { 'mongodb_connect':
-    check_command => "/usr/local/lib/nagios/plugins/check_mongodb -P $port_real -A connect"
-  }
-  nagios::nrpe::service { 'mongodb_connections':
-    check_command => "/usr/local/lib/nagios/plugins/check_mongodb -P $port_real -A connections"
+  nagios::nrpe::service {
+    'mongodb_connect':
+      check_command => "/usr/local/lib/nagios/plugins/check_mongodb -P ${port_real} -A connect",
+      nrpe_command  => 'check_nrpe_slow_1arg';
+    'mongodb_connections':
+      check_command => "/usr/local/lib/nagios/plugins/check_mongodb -P ${port_real} -A connections",
+      nrpe_command  => 'check_nrpe_slow_1arg';
   }
 
   if $shardsvr == true {
-    nagios::nrpe::service { 'mongodb_replication_lag':
-      check_command => "/usr/local/lib/nagios/plugins/check_mongodb -P $port_real -A replication_lag"
-    }
-    nagios::nrpe::service { 'mongodb_replset_state':
-      check_command => "/usr/local/lib/nagios/plugins/check_mongodb -P $port_real -A replset_state"
+    nagios::nrpe::service {
+      'mongodb_replication_lag':
+        check_command => "/usr/local/lib/nagios/plugins/check_mongodb -P ${port_real} -A replication_lag",
+        nrpe_command  => 'check_nrpe_slow_1arg';
+      'mongodb_replset_state':
+        check_command => "/usr/local/lib/nagios/plugins/check_mongodb -P ${port_real} -A replset_state",
+        nrpe_command  => 'check_nrpe_slow_1arg';
     }
   }
-
 }

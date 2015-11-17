@@ -1,13 +1,13 @@
-# mongo.conf - generated from Puppet
+# mongod.conf - generated from Puppet
 
 # Logging
-logpath=<%= @logpath %>
-logappend=<%= @logappend %>
+logpath = <%= @logpath %>
+logappend = <%= @logappend %>
 
-# Fork and run in background
+# Fork and run
 fork = <%= @mongofork %>
 port = <%= @port_real %>
-dbpath= <%= @dbpath %>
+dbpath = <%= @dbpath %>
 
 <% if @shardsvr -%>
 # Shard server
