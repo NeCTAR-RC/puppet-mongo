@@ -53,7 +53,6 @@ class mongo::server (
   $nssize          = undef,
   $mms_token       = undef,
   $mms_name        = undef,
-  $mms_name        = undef,
   $mms_interval    = undef,
   $slave           = undef,
   $only            = undef,
