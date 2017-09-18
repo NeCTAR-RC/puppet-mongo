@@ -26,9 +26,8 @@ class mongo (
 ) inherits mongo::params {
 
   # Set up repo
-  class { $mongo::params::source:
-    stage => setup,
-  }
+
+  class { $mongo::params::source: }
 
   package { 'mongodb':
     name    => $mongo::params::pkg_10gen,
